@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Principal | Sistema de Permisos Ambientales</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="dashboard.html" class="navbar-brand"
+        >🌿 MiAmbiente | Evaluación Ambiental</a
+      >
+      <div class="navbar-user">
+        <span id="navNombreUsuario">Usuario</span>
+        <span id="navRolUsuario" class="badge badge-rol">ROL</span>
+        <button id="btnCerrarSesion" class="btn btn-secondary btn-sm">
+          Cerrar Sesión
+        </button>
+      </div>
+    </nav>
+
+    <main class="container">
+      <div id="alertaDashboard" class="alert"></div>
+
+      <!-- Tarjetas de Resumen KPI -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <small>Total Solicitudes</small>
+          <b id="kpiTotal">0</b>
+        </div>
+        <div class="kpi-card">
+          <small>En Revisión / Enviadas</small>
+          <b id="kpiPendientes">0</b>
+        </div>
+        <div class="kpi-card">
+          <small>Con Observaciones</small>
+          <b id="kpiObservaciones">0</b>
+        </div>
+        <div class="kpi-card">
+          <small>Aprobadas</small>
+          <b id="kpiAprobadas">0</b>
+        </div>
+      </div>
+
+      <!-- Listado y Filtros de Solicitudes -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Expedientes y Solicitudes Ambientales</h2>
+            <small style="color: var(--muted)"
+              >Seguimiento de Estudios de Impacto Ambiental (Ley 41 de
+              1998)</small
+            >
+          </div>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap">
+            <button
+              id="btnVerPendientes"
+              class="btn btn-warning btn-sm"
+              style="display: none"
+            >
+              📋 Ver Solo Pendientes de Revisión (HU-13)
+            </button>
+            <a href="crear-solicitud.html" class="btn btn-primary"
+              >+ Nueva Solicitud Ambiental</a
+            >
+          </div>
+        </div>
+
+        <!-- Barra de Filtros -->
+        <div class="grid-3" style="margin-bottom: 1.2rem">
+          <div>
+            <label
+              for="filtroEstado"
+              style="font-size: 0.82rem; font-weight: 600"
+              >Filtrar por Estado</label
+            >
+            <select id="filtroEstado" class="form-control">
+              <option value="">Todos los estados</option>
+              <option value="Enviada">Enviada</option>
+              <option value="En Revisión">En Revisión</option>
+              <option value="Con Observaciones">Con Observaciones</option>
+              <option value="Aprobada">Aprobada</option>
+              <option value="Rechazada">Rechazada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              for="filtroCategoria"
+              style="font-size: 0.82rem; font-weight: 600"
+              >Filtrar por Categoría Ambiental (Sprint 7)</label
+            >
+            <select id="filtroCategoria" class="form-control">
+              <option value="">Todas las categorías</option>
+              <option value="Categoría I">Categoría I (Bajo Impacto)</option>
+              <option value="Categoría II">
+                Categoría II (Impacto Moderado)
+              </option>
+              <option value="Categoría III">
+                Categoría III (Alto Impacto)
+              </option>
+              <option value="Pendiente">Pendiente de Clasificar</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 0.5rem">
+            <button id="btnAplicarFiltros" class="btn btn-primary">
+              Filtrar
+            </button>
+            <button id="btnLimpiarFiltros" class="btn btn-secondary">
+              Restablecer
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Proyecto / Sector</th>
+                <th>Solicitante</th>
+                <th>Estado (HU-12)</th>
+                <th>Clasificación (HU-26)</th>
+                <th>Checklist (HU-20)</th>
+                <th>Docs / Obs</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaSolicitudes">
+              <tr>
+                <td colspan="8" style="text-align: center">
+                  Cargando solicitudes...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Panel de Gestión de Roles (Sprint 5: HU-21, HU-22 - Visible para Admin) -->
+      <div id="seccionAdminUsuarios" class="card" style="display: none">
+        <div class="card-header">
+          <div>
+            <h3>
+              🔐 Gestión de Usuarios y Asignación de Roles (Sprint 5: HU-21 /
+              HT-15)
+            </h3>
+            <small style="color: var(--muted)"
+              >Administración de permisos para Solicitantes, Evaluadores y
+              Administradores</small
+            >
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol Actual</th>
+                <th>Cambiar Rol</th>
+              </tr>
+            </thead>
+            <tbody id="tablaUsuariosAdmin"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

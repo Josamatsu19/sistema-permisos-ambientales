@@ -1,0 +1,383 @@
+{
+  "info": {
+    "_postman_id": "8f91b4c2-2026-4d71-9a11-miambiente007",
+    "name": "Sistema de Permisos Ambientales - Suite Integral Sprints 1 a 7",
+    "description": "Pruebas integrales automatizadas de API REST (Auth, Solicitudes, Documentos, Revisión, Checklist, Historial y Clasificación Ambiental).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "tokenSolicitante", "value": "" },
+    { "key": "tokenEvaluador", "value": "" },
+    { "key": "solicitudId", "value": "" },
+    { "key": "requisitoId", "value": "" },
+    { "key": "observacionId", "value": "" },
+    { "key": "emailSolicitante", "value": "" },
+    { "key": "emailEvaluador", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Servidor responde HTTP 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Respuesta contiene bandera ok: true', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.ok).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Sprint 1 - Registrar Usuario Solicitante (HU-02)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const randomEmail = `solicitante_${Date.now()}@miambiente.gob.pa`;",
+              "pm.collectionVariables.set('emailSolicitante', randomEmail);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Registro de solicitante exitoso (201)', function () {",
+              "    pm.response.to.have.status(201);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.ok).to.be.true;",
+              "    pm.expect(data.token).to.be.a('string');",
+              "    pm.collectionVariables.set('tokenSolicitante', data.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Promotora Hidroeléctrica Chiriquí\",\n  \"email\": \"{{emailSolicitante}}\",\n  \"password\": \"Permisos2026*\",\n  \"rol\": \"solicitante\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/registro"
+      }
+    },
+    {
+      "name": "2. Sprint 1 & 5 - Registrar Usuario Evaluador (HU-02 / HT-15)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const randomEval = `evaluador_${Date.now()}@miambiente.gob.pa`;",
+              "pm.collectionVariables.set('emailEvaluador', randomEval);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Registro de evaluador exitoso (201)', function () {",
+              "    pm.response.to.have.status(201);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.usuario.rol).to.eql('evaluador');",
+              "    pm.collectionVariables.set('tokenEvaluador', data.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Ing. Evaluador MiAmbiente\",\n  \"email\": \"{{emailEvaluador}}\",\n  \"password\": \"Evaluador2026*\",\n  \"rol\": \"evaluador\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/registro"
+      }
+    },
+    {
+      "name": "3. Sprint 1 - Consultar Perfil Autenticado (HU-04)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Perfil devuelto correctamente (200)', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.usuario.email).to.eql(pm.collectionVariables.get('emailSolicitante'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenSolicitante}}" }
+        ],
+        "url": "{{baseUrl}}/api/auth/perfil"
+      }
+    },
+    {
+      "name": "4. Sprint 2 & 7 - Crear Solicitud Ambiental con Clasificación (HU-05 / HU-24)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Solicitud creada con estado 201 y clasificada', function () {",
+              "    pm.response.to.have.status(201);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.ok).to.be.true;",
+              "    pm.expect(data.solicitud.id).to.be.a('number');",
+              "    pm.expect(data.solicitud.categoria_ambiental).to.be.oneOf(['Categoría I', 'Categoría II', 'Categoría III']);",
+              "    pm.collectionVariables.set('solicitudId', data.solicitud.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenSolicitante}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre_proyecto\": \"Planta Solar Fotovoltaica La Estrella\",\n  \"descripcion\": \"Instalación de paneles solares de 15 MW con subestación eléctrica.\",\n  \"ubicacion\": \"Chiriquí, Bugaba\",\n  \"sector\": \"Energía e Hidrocarburos\",\n  \"tipo_permiso\": \"Estudio de Impacto Ambiental (EsIA)\",\n  \"cuestionario_ambiental\": {\n    \"extension_hectareas\": 18.5,\n    \"afectacion_hidrica\": \"baja\",\n    \"afectacion_forestal\": \"media\",\n    \"nivel_emisiones\": \"bajo\",\n    \"cercania_areas_protegidas\": \"entre_1_5km\",\n    \"riesgo_social\": \"bajo\",\n    \"manejo_residuos_peligrosos\": false\n  }\n}"
+        },
+        "url": "{{baseUrl}}/api/solicitudes"
+      }
+    },
+    {
+      "name": "5. Sprint 2 - Editar Solicitud Ambiental (HU-07)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Solicitud actualizada correctamente (200)', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.solicitud.ubicacion).to.include('Alanje');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenSolicitante}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre_proyecto\": \"Planta Solar Fotovoltaica La Estrella - Fase I\",\n  \"ubicacion\": \"Chiriquí, Bugaba y Alanje\"\n}"
+        },
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}"
+      }
+    },
+    {
+      "name": "6. Sprint 5 - Consultar Checklist de Requisitos (HU-18 / HU-20)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Checklist inicializado con 7 requisitos oficiales', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.checklist.length).to.be.above(0);",
+              "    pm.collectionVariables.set('requisitoId', data.checklist[0].id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenSolicitante}}" }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}/checklist"
+      }
+    },
+    {
+      "name": "7. Sprint 5 - Marcar Requisito del Checklist como Cumplido (HU-19)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Requisito marcado como cumplido y progreso > 0%', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.progreso.requisitos_cumplidos).to.be.above(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenSolicitante}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cumplido\": true,\n  \"observacion_verificacion\": \"Formulario firmado digitalmente\"\n}"
+        },
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}/checklist/{{requisitoId}}"
+      }
+    },
+    {
+      "name": "8. Sprint 4 - Registrar Observación Técnica como Evaluador (HU-15)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Observación creada por el evaluador (201)', function () {",
+              "    pm.response.to.have.status(201);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.observacion.id).to.be.a('number');",
+              "    pm.collectionVariables.set('observacionId', data.observacion.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenEvaluador}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipo\": \"Observación Técnica\",\n  \"comentario\": \"Anexar coordenadas UTM del polígono de amortiguamiento.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}/observaciones"
+      }
+    },
+    {
+      "name": "9. Sprint 4 - Actualizar Estado de Solicitud en Revisión (HU-14 / HU-17)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado actualizado a En Revisión (200)', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.solicitud.estado).to.eql('En Revisión');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenEvaluador}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"En Revisión\",\n  \"comentario\": \"Se inicia evaluación interdisciplinaria de MiAmbiente.\"\n}"
+        },
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}/estado"
+      }
+    },
+    {
+      "name": "10. Sprint 7 - Recalcular y Consultar Clasificación Ambiental (HU-25 / HU-26)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Clasificación Categoría III calculada para impacto alto (200)', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.clasificacion.categoria_resultante).to.eql('Categoría III');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenEvaluador}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"extension_hectareas\": 75,\n  \"afectacion_hidrica\": \"alta\",\n  \"afectacion_forestal\": \"alta\",\n  \"nivel_emisiones\": \"medio\",\n  \"cercania_areas_protegidas\": \"menor_1km\",\n  \"riesgo_social\": \"medio\",\n  \"manejo_residuos_peligrosos\": true\n}"
+        },
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}/clasificacion"
+      }
+    },
+    {
+      "name": "11. Sprint 6 - Consultar Historial y Trazabilidad Completa (HU-23 / HT-16 a HT-18)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Historial registra todos los eventos de auditoría (200)', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.ok).to.be.true;",
+              "    pm.expect(data.total_eventos).to.be.at.least(4);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenSolicitante}}" }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}/historial"
+      }
+    }
+  ]
+}

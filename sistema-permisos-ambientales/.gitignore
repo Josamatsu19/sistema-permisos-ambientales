@@ -1,0 +1,16 @@
+# Dependencias de Node.js
+backend/node_modules/
+
+# Variables de entorno y secretos
+backend/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuración local de editores
+.vscode/

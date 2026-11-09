@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expediente Ambiental | Sistema de Permisos Ambientales</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="dashboard.html" class="navbar-brand"
+        >🌿 MiAmbiente | Expediente Ambiental</a
+      >
+      <div class="navbar-user">
+        <span id="navUsuarioDetalle"></span>
+        <a href="dashboard.html" class="btn btn-secondary btn-sm"
+          >← Volver al Panel</a
+        >
+      </div>
+    </nav>
+
+    <main class="container">
+      <div id="alertaDetalle" class="alert"></div>
+
+      <!-- Encabezado Resumen del Expediente -->
+      <div class="card">
+        <div
+          class="card-header"
+          style="margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0"
+        >
+          <div>
+            <h2 id="tituloExpediente">Cargando expediente...</h2>
+            <p
+              id="subtituloExpediente"
+              style="color: var(--muted); font-size: 0.9rem"
+            ></p>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 0.6rem;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <span id="badgeEstadoActual" class="badge"></span>
+            <span id="badgeCategoriaActual" class="badge"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- COLUMNA IZQUIERDA: Datos del Proyecto + Clasificación Ambiental -->
+        <div>
+          <!-- 1. Datos de la Solicitud (Sprint 2: HU-07) -->
+          <div class="card">
+            <div class="card-header">
+              <h3>1. Datos del Proyecto (HU-06 / HU-07)</h3>
+            </div>
+            <form id="formEditarSolicitud">
+              <div class="form-group">
+                <label for="edit_nombre_proyecto">Nombre del Proyecto</label>
+                <input
+                  type="text"
+                  id="edit_nombre_proyecto"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="edit_sector">Sector</label>
+                  <input
+                    type="text"
+                    id="edit_sector"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="edit_ubicacion">Ubicación</label>
+                  <input
+                    type="text"
+                    id="edit_ubicacion"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="edit_tipo_permiso">Tipo de Permiso</label>
+                <input
+                  type="text"
+                  id="edit_tipo_permiso"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="edit_descripcion">Descripción Técnica</label>
+                <textarea
+                  id="edit_descripcion"
+                  rows="3"
+                  class="form-control"
+                  required
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                id="btnGuardarCambios"
+                class="btn btn-primary btn-sm"
+              >
+                💾 Guardar Cambios del Proyecto
+              </button>
+            </form>
+          </div>
+
+          <!-- 2. Clasificación Ambiental Preliminar (Sprint 7: HU-24, HU-25, HU-26) -->
+          <div class="card">
+            <div class="card-header">
+              <h3>2. Clasificación Ambiental (Sprint 7: HU-24 a HU-26)</h3>
+            </div>
+            <div
+              id="resumenClasificacionBox"
+              style="
+                margin-bottom: 1rem;
+                padding: 0.85rem;
+                background: #f4f9f5;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+              "
+            >
+              <p id="textoDictamenClasificacion" style="font-size: 0.88rem">
+                Sin evaluación registrada aún.
+              </p>
+            </div>
+
+            <form id="formClasificacion">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="clas_hectareas">Extensión (Hectáreas)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    id="clas_hectareas"
+                    class="form-control"
+                    value="5"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="clas_hidrica">Afectación Hídrica</label>
+                  <select id="clas_hidrica" class="form-control">
+                    <option value="ninguna">Ninguna</option>
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="clas_forestal">Afectación Forestal</label>
+                  <select id="clas_forestal" class="form-control">
+                    <option value="ninguna">Ninguna</option>
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="clas_emisiones">Nivel de Emisiones</label>
+                  <select id="clas_emisiones" class="form-control">
+                    <option value="ninguno">Ninguno</option>
+                    <option value="bajo">Bajo</option>
+                    <option value="medio">Medio</option>
+                    <option value="alto">Alto</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="clas_areas">Cercanía Áreas Protegidas</label>
+                  <select id="clas_areas" class="form-control">
+                    <option value="mayor_5km">Mayor a 5 km</option>
+                    <option value="entre_1_5km">Entre 1 y 5 km</option>
+                    <option value="menor_1km">Menor a 1 km</option>
+                    <option value="dentro_area">
+                      Dentro de Área Protegida
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="clas_social">Riesgo Social</label>
+                  <select id="clas_social" class="form-control">
+                    <option value="bajo">Bajo</option>
+                    <option value="medio">Medio</option>
+                    <option value="alto">Alto</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.45rem;
+                  "
+                >
+                  <input type="checkbox" id="clas_residuos" /> Manejo de
+                  residuos peligrosos
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">
+                ⚖️ Calcular / Actualizar Clasificación Ambiental
+              </button>
+            </form>
+          </div>
+
+          <!-- 3. Gestión de Documentos Adjuntos (Sprint 3: HU-09, HU-10, HU-11) -->
+          <div class="card">
+            <div class="card-header">
+              <h3>3. Documentos Adjuntos (Sprint 3: HU-09 a HU-11)</h3>
+            </div>
+            <form id="formSubirDocumento" style="margin-bottom: 1rem">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="tipo_documento">Tipo de Documento</label>
+                  <select id="tipo_documento" class="form-control">
+                    <option value="Estudio de Impacto Ambiental (PDF)">
+                      Estudio de Impacto Ambiental (PDF)
+                    </option>
+                    <option value="Plano Cartográfico / Coordenadas">
+                      Plano Cartográfico / Coordenadas
+                    </option>
+                    <option value="Certificación de Registro Público">
+                      Certificación de Registro Público
+                    </option>
+                    <option value="Plan de Manejo Ambiental (PMA)">
+                      Plan de Manejo Ambiental (PMA)
+                    </option>
+                    <option value="Comprobante de Pago de Tasa">
+                      Comprobante de Pago de Tasa
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="archivo_adjunto"
+                    >Archivo (PDF, JPG, PNG máx. 5 MB)</label
+                  >
+                  <input
+                    type="file"
+                    id="archivo_adjunto"
+                    class="form-control"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">
+                📤 Adjuntar Documento
+              </button>
+            </form>
+
+            <div id="listaDocumentos"></div>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: Checklist + Revisión/Observaciones + Historial -->
+        <div>
+          <!-- 4. Checklist de Requisitos (Sprint 5: HU-18, HU-19, HU-20) -->
+          <div class="card">
+            <div class="card-header">
+              <h3>
+                4. Checklist de Requisitos Legales (Sprint 5: HU-18 a HU-20)
+              </h3>
+              <span id="badgeProgresoChecklist" class="badge estado-Enviada"
+                >0%</span
+              >
+            </div>
+            <div class="progress-wrap" style="margin-bottom: 1rem">
+              <div
+                id="barraProgresoChecklist"
+                class="progress-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+            <div id="contenedorChecklist"></div>
+          </div>
+
+          <!-- 5. Dictamen de Revisión y Observaciones (Sprint 4: HU-14 a HU-17) -->
+          <div class="card">
+            <div class="card-header">
+              <h3>
+                5. Revisión Técnica y Observaciones (Sprint 4: HU-14 a HU-17)
+              </h3>
+            </div>
+
+            <!-- Formulario exclusivo para Evaluador / Admin -->
+            <div
+              id="panelEvaluadorRevision"
+              style="
+                display: none;
+                background: #f4f9f5;
+                padding: 1rem;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                margin-bottom: 1.2rem;
+              "
+            >
+              <h4 style="margin-bottom: 0.6rem; color: var(--primary)">
+                Panel Exclusivo de Evaluador / Admin
+              </h4>
+              <form id="formCambiarEstado" style="margin-bottom: 1rem">
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label for="nuevo_estado_revision"
+                      >Actualizar Estado del Expediente (HU-17)</label
+                    >
+                    <select id="nuevo_estado_revision" class="form-control">
+                      <option value="Enviada">Enviada</option>
+                      <option value="En Revisión">En Revisión</option>
+                      <option value="Con Observaciones">
+                        Con Observaciones
+                      </option>
+                      <option value="Aprobada">Aprobada</option>
+                      <option value="Rechazada">Rechazada</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="comentario_dictamen"
+                      >Dictamen / Motivo de Cambio de Estado</label
+                    >
+                    <input
+                      type="text"
+                      id="comentario_dictamen"
+                      class="form-control"
+                      placeholder="Ej. Cumple con todos los requisitos técnicos..."
+                    />
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">
+                  ✔ Actualizar Estado Oficial
+                </button>
+              </form>
+
+              <hr
+                style="
+                  border: 0;
+                  border-top: 1px solid var(--border);
+                  margin: 0.8rem 0;
+                "
+              />
+
+              <form id="formNuevaObservacion">
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label for="tipo_observacion"
+                      >Tipo de Hallazgo (HU-15)</label
+                    >
+                    <select id="tipo_observacion" class="form-control">
+                      <option value="Observación Técnica">
+                        Observación Técnica
+                      </option>
+                      <option value="Requerimiento Legal">
+                        Requerimiento Legal
+                      </option>
+                      <option value="Subsanación">Subsanación</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="comentario_observacion"
+                      >Detalle de la Observación</label
+                    >
+                    <input
+                      type="text"
+                      id="comentario_observacion"
+                      class="form-control"
+                      placeholder="Ej. Falta firma del consultor en el PMA..."
+                      required
+                    />
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-warning btn-sm">
+                  ➕ Registrar Observación
+                </button>
+              </form>
+            </div>
+
+            <div id="listaObservaciones"></div>
+          </div>
+
+          <!-- 6. Línea de Tiempo / Historial y Trazabilidad (Sprint 6: HU-23, HT-16 a HT-18) -->
+          <div class="card">
+            <div class="card-header">
+              <h3>6. Línea de Tiempo y Trazabilidad (Sprint 6: HU-23)</h3>
+              <button
+                type="button"
+                id="btnRefrescarHistorial"
+                class="btn btn-secondary btn-sm"
+              >
+                🔄 Actualizar
+              </button>
+            </div>
+            <div id="contenedorHistorial" class="timeline"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/editar-solicitud.js"></script>
+  </body>
+</html>

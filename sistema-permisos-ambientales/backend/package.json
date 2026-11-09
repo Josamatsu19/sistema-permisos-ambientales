@@ -1,0 +1,27 @@
+{
+  "name": "sistema-permisos-ambientales-backend",
+  "version": "2.0.0",
+  "description": "Sistema Digital de Gestión y Evaluación de Permisos Ambientales - MiAmbiente (Ley 41 de 1998)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "lint": "node --check server.js && node --check controllers/solicitudController.js && node --check controllers/clasificacionController.js",
+    "test:api": "npx newman run ../postman/sistema-permisos-ambientales.postman_collection.json --env-var baseUrl=http://localhost:3000"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.0"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "nodemon": "^3.1.4"
+  }
+}

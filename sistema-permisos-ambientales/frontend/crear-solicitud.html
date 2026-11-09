@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nueva Solicitud Ambiental | MiAmbiente</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="dashboard.html" class="navbar-brand"
+        >🌿 MiAmbiente | Nueva Solicitud</a
+      >
+      <div class="navbar-user">
+        <a href="dashboard.html" class="btn btn-secondary btn-sm"
+          >← Volver al Panel</a
+        >
+      </div>
+    </nav>
+
+    <main class="container">
+      <div id="alertaCrear" class="alert"></div>
+
+      <form id="formCrearSolicitud">
+        <!-- Datos Generales del Proyecto (Sprint 2: HU-05) -->
+        <div class="card">
+          <div class="card-header">
+            <h2>1. Información General del Proyecto (HU-05)</h2>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="nombre_proyecto">Nombre del Proyecto *</label>
+              <input
+                type="text"
+                id="nombre_proyecto"
+                class="form-control"
+                placeholder="Ej. Parque Solar Fotovoltaico Coclé"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="sector">Sector Productivo *</label>
+              <select id="sector" class="form-control" required>
+                <option value="Energía e Hidrocarburos">
+                  Energía e Hidrocarburos
+                </option>
+                <option value="Infraestructura y Construcción">
+                  Infraestructura y Construcción
+                </option>
+                <option value="Agroindustria y Forestal">
+                  Agroindustria y Forestal
+                </option>
+                <option value="Minería y Extracción">
+                  Minería y Extracción
+                </option>
+                <option value="Turismo y Desarrollo Costero">
+                  Turismo y Desarrollo Costero
+                </option>
+                <option value="Saneamiento y Gestión de Residuos">
+                  Saneamiento y Gestión de Residuos
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="ubicacion"
+                >Ubicación Geográfica (Provincia, Distrito, Corregimiento)
+                *</label
+              >
+              <input
+                type="text"
+                id="ubicacion"
+                class="form-control"
+                placeholder="Ej. Coclé, Penonomé, Río Grande"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="tipo_permiso">Tipo de Trámite Ambiental *</label>
+              <select id="tipo_permiso" class="form-control">
+                <option value="Estudio de Impacto Ambiental (EsIA)">
+                  Estudio de Impacto Ambiental (EsIA)
+                </option>
+                <option value="Permiso de Tala y Desmonte">
+                  Permiso de Tala y Desmonte
+                </option>
+                <option value="Concesión de Uso de Agua">
+                  Concesión de Uso de Agua
+                </option>
+                <option value="Permiso de Descarga de Efluentes">
+                  Permiso de Descarga de Efluentes
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion"
+              >Descripción Técnica del Proyecto y Fases de Ejecución *</label
+            >
+            <textarea
+              id="descripcion"
+              rows="4"
+              class="form-control"
+              placeholder="Describa las obras, alcance, insumos y medidas preliminares..."
+              required
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Cuestionario de Clasificación Ambiental Preliminar (Sprint 7: HU-24, HU-25) -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>
+                2. Matriz de Clasificación Ambiental Preliminar (Sprint 7: HU-24
+                y HU-25)
+              </h2>
+              <small style="color: var(--muted)"
+                >Cálculo automático de Categoría I, II o III según Ley 41 de
+                1998 y Decreto Ejecutivo 123</small
+              >
+            </div>
+            <button
+              type="button"
+              id="btnSimularClasificacion"
+              class="btn btn-secondary btn-sm"
+            >
+              ⚡ Simular Categoría Ahora
+            </button>
+          </div>
+
+          <div class="grid-3">
+            <div class="form-group">
+              <label for="extension_hectareas"
+                >Área de Intervención (Hectáreas)</label
+              >
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                id="extension_hectareas"
+                class="form-control"
+                value="4.5"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="afectacion_hidrica"
+                >Afectación a Cuerpos Hídricos</label
+              >
+              <select id="afectacion_hidrica" class="form-control">
+                <option value="ninguna">Ninguna</option>
+                <option value="baja">Baja (Cruces menores / sin desvío)</option>
+                <option value="media">
+                  Media (Captación o descarga tratada)
+                </option>
+                <option value="alta">Alta (Desvío de cauce / humedales)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="afectacion_forestal"
+                >Afectación Forestal y Biodiversidad</label
+              >
+              <select id="afectacion_forestal" class="form-control">
+                <option value="ninguna">Ninguna (Área ya intervenida)</option>
+                <option value="baja">
+                  Baja (Rastrojo / vegetación secundaria)
+                </option>
+                <option value="media">Media (Bosque secundario maduro)</option>
+                <option value="alta">
+                  Alta (Bosque primario / especies protegidas)
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="nivel_emisiones"
+                >Nivel de Emisiones, Ruido y Efluentes</label
+              >
+              <select id="nivel_emisiones" class="form-control">
+                <option value="ninguno">Ninguno</option>
+                <option value="bajo">Bajo</option>
+                <option value="medio">Medio</option>
+                <option value="alto">Alto</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="cercania_areas_protegidas"
+                >Proximidad a Áreas Protegidas (SINAP)</label
+              >
+              <select id="cercania_areas_protegidas" class="form-control">
+                <option value="mayor_5km">Mayor a 5 km de distancia</option>
+                <option value="entre_1_5km">
+                  Entre 1 km y 5 km (Zona de amortiguamiento)
+                </option>
+                <option value="menor_1km">Menor a 1 km de distancia</option>
+                <option value="dentro_area">
+                  Dentro de Área Protegida / Reserva
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="riesgo_social"
+                >Riesgo Socioambiental / Comunidades</label
+              >
+              <select id="riesgo_social" class="form-control">
+                <option value="bajo">
+                  Bajo (Sin reasentamiento ni afectación)
+                </option>
+                <option value="medio">
+                  Medio (Molestias temporales controlables)
+                </option>
+                <option value="alto">
+                  Alto (Reasentamiento o impacto directo)
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 0.4rem">
+            <label
+              style="
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+              "
+            >
+              <input type="checkbox" id="manejo_residuos_peligrosos" />
+              El proyecto involucra manejo, transporte o disposición de
+              residuos/sustancias peligrosas
+            </label>
+          </div>
+
+          <!-- Resultado Preliminar en Vivo -->
+          <div
+            id="cajaResultadoSimulacion"
+            style="
+              display: none;
+              padding: 1rem;
+              border-radius: 10px;
+              background: #eef6f0;
+              border: 1px solid var(--border);
+              margin-top: 1rem;
+            "
+          >
+            <strong>Dictamen Preliminar Estimado: </strong>
+            <span id="simCategoriaBadge" class="badge"></span>
+            <span
+              id="simPuntajeTexto"
+              style="font-weight: 700; margin-left: 0.5rem"
+            ></span>
+            <p
+              id="simJustificacionTexto"
+              style="font-size: 0.88rem; margin-top: 0.5rem; color: var(--text)"
+            ></p>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.8rem">
+          <a href="dashboard.html" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary">
+            Registrar Solicitud y Clasificación Ambiental
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <script src="js/crear-solicitud.js"></script>
+  </body>
+</html>

@@ -1,10 +1,3 @@
----
-
-## 4. Pipeline CI/CD Actualizado (`Jenkinsfile`)
-
-Cumple con **`HE-07` (Validar pipeline Jenkins)**, ejecutando verificación de entorno, instalación de dependencias (`npm install`), validación sintáctica/linting, auditoría de estructura de seguridad y ejecución de pruebas integrales de API con `newman`[cite: 1, 2].
-
-```groovy
 pipeline {
     agent any
 

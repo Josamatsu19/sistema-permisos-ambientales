@@ -17,7 +17,8 @@ pipeline {
 
         stage('2. Instalación de Dependencias Backend') {
             steps {
-                dir('backend') {
+                // Actualizado para entrar a la subcarpeta del repositorio
+                dir('sistema-permisos-ambientales/backend') {
                     echo 'Instalando paquetes Node.js (Express, MySQL2, Helmet, Rate-Limit, Newman)...'
                     bat '''
                         npm install
@@ -28,7 +29,7 @@ pipeline {
 
         stage('3. Linting y Verificación Sintáctica') {
             steps {
-                dir('backend') {
+                dir('sistema-permisos-ambientales/backend') {
                     echo 'Validando sintaxis de controladores, middlewares y rutas...'
                     bat '''
                         node --check server.js
@@ -45,19 +46,21 @@ pipeline {
 
         stage('4. Verificación de Artefactos de Seguridad (SecOps)') {
             steps {
-                echo 'Verificando existencia de scripts Nmap, reportes de seguridad y colección Postman...'
-                bat '''
-                    IF NOT EXIST seguridad\\run-nmap-inicial.sh EXIT /B 1
-                    IF NOT EXIST seguridad\\REPORTE_SEGURIDAD_SPRINT6.md EXIT /B 1
-                    IF NOT EXIST seguridad\\REPORTE_SEGURIDAD_FINAL_SPRINT7.md EXIT /B 1
-                    IF NOT EXIST postman\\sistema-permisos-ambientales.postman_collection.json EXIT /B 1
-                '''
+                dir('sistema-permisos-ambientales') {
+                    echo 'Verificando existencia de scripts Nmap, reportes de seguridad y colección Postman...'
+                    bat '''
+                        IF NOT EXIST seguridad\\run-nmap-inicial.sh EXIT /B 1
+                        IF NOT EXIST seguridad\\REPORTE_SEGURIDAD_SPRINT6.md EXIT /B 1
+                        IF NOT EXIST seguridad\\REPORTE_SEGURIDAD_FINAL_SPRINT7.md EXIT /B 1
+                        IF NOT EXIST postman\\sistema-permisos-ambientales.postman_collection.json EXIT /B 1
+                    '''
+                }
             }
         }
 
         stage('5. Pruebas Integrales de API con Newman (HT-21)') {
             steps {
-                dir('backend') {
+                dir('sistema-permisos-ambientales/backend') {
                     echo 'Ejecutando suite automatizada de Postman con Newman si el servidor/BD está activo...'
                     bat '''
                         curl -s http://localhost:3000/api/health | findstr "ok" >nul

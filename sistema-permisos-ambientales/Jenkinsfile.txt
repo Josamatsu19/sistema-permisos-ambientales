@@ -19,7 +19,7 @@ pipeline {
             steps {
                 dir('backend') {
                     echo 'Instalando paquetes Node.js (Express, MySQL2, Helmet, Rate-Limit, Newman)...'
-                    sh '''
+                    bat '''
                         npm install
                     '''
                 }
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 dir('backend') {
                     echo 'Validando sintaxis de controladores, middlewares y rutas...'
-                    sh '''
+                    bat '''
                         node --check server.js
                         node --check middleware/authMiddleware.js
                         node --check middleware/uploadMiddleware.js
@@ -46,11 +46,11 @@ pipeline {
         stage('4. Verificación de Artefactos de Seguridad (SecOps)') {
             steps {
                 echo 'Verificando existencia de scripts Nmap, reportes de seguridad y colección Postman...'
-                sh '''
-                    test -f seguridad/run-nmap-inicial.sh
-                    test -f seguridad/REPORTE_SEGURIDAD_SPRINT6.md
-                    test -f seguridad/REPORTE_SEGURIDAD_FINAL_SPRINT7.md
-                    test -f postman/sistema-permisos-ambientales.postman_collection.json
+                bat '''
+                    IF NOT EXIST seguridad\\run-nmap-inicial.sh EXIT /B 1
+                    IF NOT EXIST seguridad\\REPORTE_SEGURIDAD_SPRINT6.md EXIT /B 1
+                    IF NOT EXIST seguridad\\REPORTE_SEGURIDAD_FINAL_SPRINT7.md EXIT /B 1
+                    IF NOT EXIST postman\\sistema-permisos-ambientales.postman_collection.json EXIT /B 1
                 '''
             }
         }
@@ -59,16 +59,14 @@ pipeline {
             steps {
                 dir('backend') {
                     echo 'Ejecutando suite automatizada de Postman con Newman si el servidor/BD está activo...'
-                    sh '''
-                        if curl -s http://localhost:3000/api/health | grep -q "ok"; then
-                            npx newman run ../postman/sistema-permisos-ambientales.postman_collection.json \
-                              --env-var baseUrl=http://localhost:3000 \
-                              --reporters cli,junit \
-                              --reporter-junit-export newman-report.xml
-                        else
+                    bat '''
+                        curl -s http://localhost:3000/api/health | findstr "ok" >nul
+                        IF %ERRORLEVEL% EQU 0 (
+                            npx newman run ../postman/sistema-permisos-ambientales.postman_collection.json --env-var baseUrl=http://localhost:3000 --reporters cli,junit --reporter-junit-export newman-report.xml
+                        ) ELSE (
                             echo "Servidor local no detectado en puerto 3000 durante el build aislado; validando estructura JSON de la colección Postman..."
                             node -e "const col = require('../postman/sistema-permisos-ambientales.postman_collection.json'); if(!col.item || col.item.length < 10) process.exit(1); console.log('Colección Postman verificada con ' + col.item.length + ' casos de prueba.');"
-                        fi
+                        )
                     '''
                 }
             }
